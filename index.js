@@ -24,7 +24,7 @@ db.serialize(function() {
 		tension_ent INTEGER,
 		tension_sal INTEGER,
 		bateria INTEGER,
-		FOREIGN KEY stalker_id REFERENCES stalkers(stalker_id)
+		FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
 	)`);
 	var stmt = db.prepare('INSERT INTO lorem VALUES (?)')
 
