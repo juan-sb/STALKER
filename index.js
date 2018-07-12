@@ -5,7 +5,9 @@ var sqlite3 = require('sqlite3').verbose()
 
 const puerto = process.env.PORT || 3000; 
 
-var db = new sqlite3.Database('./STALKERDB/StalkerDebug.db', function (err) {
+const dburl = './STALKERDB/StalkerDebug.db';
+
+var db = new sqlite3.Database(dburl, function (err) {
 	if (err)
 		console.error(err.message)
 	else
@@ -41,7 +43,7 @@ db.serialize(function() {
 	})
 })
 
-db.close()
+db.parallelize();
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -53,8 +55,25 @@ app.get('/', (req, res) => res.send("Hola mundo"))
 app.get('/test1/desc', (req, res) => res.download('logoSTALKER.png', 'logo.png'))
 
 
-app.get('/:num', (req, res) => res.send("Has pedido " + req.params.num))
+//app.get('/:num', (req, res) => res.send("Has pedido " + req.params.num))
+app.get('/api/:num', function (req, res) {
+	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.params.num), function(err, row){
 
+		var o = {
+			"id": row.id,
+			"stalker_id": row.stalker_id,
+			"timestamp": row.timestamp,
+			"tension_ent": row.tension_ent,
+			"tension_sal": tension_sal,
+			"corriente_ent": corriente_ent,
+			"corriente_sal": corriente_sal,
+			"bateria": bateria
+		}
+
+		console.log(o)
+		res.send(o)
+	})
+})
 
 app.param('nombre', function (req, res, next, nombre) {
 	req.nombre = (nombre == 'Juan') ? 'Admin Juan' : 'Random' + nombre;
