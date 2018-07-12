@@ -69,5 +69,4 @@ app.post('/post/', function (req, res){
 	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac);
 })
 
-
-app.listen(3000, () => console.log("Corriendo servidor en el puerto 3000"))
+app.listen(process.env.PORT || 3000, () => console.log("Corriendo servidor en el puerto " + process.env.PORT||3000 ))
