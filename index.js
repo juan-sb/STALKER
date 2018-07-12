@@ -64,29 +64,6 @@ app.get('/api', function (req, res) {
 		}
 	})
 })
-app.get('/json', function (req, res) {
-	if (req.query.id > 0) {
-	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.query.id), function(err, row){
-		if(err){ 
-			console.log(err.message); 
-			res.send("ERROR")
-		}
-		else{
-			var o = {
-				"id": row.id,
-				"stalker_id": row.stalker_id,
-				"timestamp": row.timestamp,
-				"tension_ent": row.tension_ent,
-				"tension_sal": row.tension_sal,
-				"corriente_ent": row.corriente_ent,
-				"corriente_sal": row.corriente_sal,
-				"bateria": row.bateria
-			}
-			console.log(o)
-			res.send(o)
-		}
-	})}
-})
 
 app.param('nombre', function (req, res, next, nombre) {
 	req.nombre = (nombre == 'Juan') ? 'Admin Juan' : 'Random' + nombre;

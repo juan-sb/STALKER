@@ -58,9 +58,13 @@ for cont in range(total):
                 (stalker_id, timestamp, corriente_ent,
                 corriente_sal, tension_ent, tension_sal, bateria)
                 VALUES (?,?,?,?,?,?,?)''', fila)
+    print(fila)
     fila[1] = fila[1] + dt
     for x in range(2, len(fila)):
-            fila[x] = fila[x] + 100 * r.gauss(0, 0.2)
+            fila[x] = fila[x] + int(500 * r.gauss(0, 0.2))
+            while(fila[x] < 0):
+                    fila[x] = fila[x] + int(500 * r.gauss(0, 0.2))
+                
 
 conn.commit()
 conn.close()
