@@ -5,7 +5,7 @@ var sqlite3 = require('sqlite3').verbose()
 
 const puerto = process.env.PORT || 3000; 
 
-const dburl = './STALKERDB/StalkerDebug.db';
+const dburl = './STALKERDB/StalkerDebug2.db';
 
 var db = new sqlite3.Database(dburl, function (err) {
 	if (err)
