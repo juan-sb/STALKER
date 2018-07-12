@@ -72,7 +72,7 @@ app.get('/api/getone', function (req, res) {
 	})
 })
 
-app.get('/api/rango', function (req, res) {
+app.get('/api/rango', function (req, res) {s
 	if(!req.query.from || !req.query.to) {
 		console.log("Argumentos erroneos")
 		res.send("Argumentos erroneos")
