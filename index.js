@@ -71,4 +71,4 @@ app.post('/post/', function (req, res){
 	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac);
 })
 
-app.listen(port, () => console.log("Corriendo servidor en el puerto " + port ))
+app.listen(puerto, () => console.log("Corriendo servidor en el puerto " + puerto))
