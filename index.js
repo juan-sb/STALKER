@@ -3,6 +3,8 @@ const app = express()
 const bodyParser = require('body-parser')
 var sqlite3 = require('sqlite3').verbose()
 
+const puerto = process.env.PORT || 3000; 
+
 var db = new sqlite3.Database('./STALKERDB/StalkerDebug.db', function (err) {
 	if (err)
 		console.error(err.message)
@@ -69,4 +71,4 @@ app.post('/post/', function (req, res){
 	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac);
 })
 
-app.listen(process.env.PORT || 3000, () => console.log("Corriendo servidor en el puerto " + process.env.PORT||3000 ))
+app.listen(port, () => console.log("Corriendo servidor en el puerto " + port ))
