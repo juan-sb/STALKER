@@ -15,7 +15,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS stalkers (
 c.execute('''CREATE TABLE IF NOT EXISTS mediciones (
 		id INTEGER PRIMARY KEY,
 		stalker_id INTEGER,
-		timestamp INTEGER
+		timestamp INTEGER,
 		corriente_ent INTEGER,
 		corriente_sal INTEGER,
 		tension_ent INTEGER,
@@ -25,38 +25,42 @@ c.execute('''CREATE TABLE IF NOT EXISTS mediciones (
 	)''')
 
 print("Ingrese el valor de la ID unica del STALKER: ");
-sta_id = input()
+sta_id = int(input())
 
 print("Ingrese la fecha y hora inicial en tiempo UNIX: ")
-t0 = input()
+t0 = int(input())
 
 print("Ingrese el valor inicial de tension de entrada en mV: ")
-tens_ent = input()
+tens_ent = int(input())
 
 print("Ingrese el valor inicial de tension de salida en mV: ")
-tens_sal = input()
+tens_sal = int(input())
 
 print("Ingrese el valor inicial de corriente de entrada en mA: ")
-corr_ent = input()
+corr_ent = int(input())
 
 print("Ingrese el valor inicial de corriente de salida en mA: ")
-corr_sal = input()
+corr_sal = int(input())
 
 print("Ingrese el valor inicial de bateria en centésimas de %: ");
-bat = input()
+bat = int(input())
 
 print("Ingrese el tiempo entre mediciones en segundos: ")
-dt = input()
+dt = int(input())
 
 print("Ingrese el numero de valores a generar e ingresar: ")
-total = input()
+total = int(input())
 
-fila = (sta_id, t0, corr_ent, corr_sal, tens_ent, tens_sal, bat)
+fila = [sta_id, t0, corr_ent, corr_sal, tens_ent, tens_sal, bat]
 
-for c in range(total):
+for cont in range(total):
     c.execute('''INSERT INTO mediciones
                 (stalker_id, timestamp, corriente_ent,
                 corriente_sal, tension_ent, tension_sal, bateria)
                 VALUES (?,?,?,?,?,?,?)''', fila)
-    for x in range(len(fila)):
-        fila[x] = fila[x] + 100 * r.gauss(0, 0.2)
+    fila[1] = fila[1] + dt
+    for x in range(2, len(fila)):
+            fila[x] = fila[x] + 100 * r.gauss(0, 0.2)
+
+conn.commit()
+conn.close()
