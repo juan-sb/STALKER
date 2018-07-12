@@ -45,23 +45,47 @@ app.get('/test1/desc', (req, res) => res.download('logoSTALKER.png', 'logo.png')
 
 
 //app.get('/:num', (req, res) => res.send("Has pedido " + req.params.num))
-app.get('/api/:num', function (req, res) {
-	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.params.num), function(err, row){
-
-		var o = {
-			"id": row.id,
-			"stalker_id": row.stalker_id,
-			"timestamp": row.timestamp,
-			"tension_ent": row.tension_ent,
-			"tension_sal": row.tension_sal,
-			"corriente_ent": row.corriente_ent,
-			"corriente_sal": row.corriente_sal,
-			"bateria": row.bateria
+app.get('/api', function (req, res) {
+	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.query.id), function(err, row){
+		if(err) console.log(err.message)
+		else{
+			var o = {
+				"id": row.id,
+				"stalker_id": row.stalker_id,
+				"timestamp": row.timestamp,
+				"tension_ent": row.tension_ent,
+				"tension_sal": row.tension_sal,
+				"corriente_ent": row.corriente_ent,
+				"corriente_sal": row.corriente_sal,
+				"bateria": row.bateria
+			}
+			console.log(o)
+			res.send(o)
 		}
-
-		console.log(o)
-		res.send(o)
 	})
+})
+app.get('/json', function (req, res) {
+	if (req.query.id > 0) {
+	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.query.id), function(err, row){
+		if(err){ 
+			console.log(err.message); 
+			res.send("ERROR")
+		}
+		else{
+			var o = {
+				"id": row.id,
+				"stalker_id": row.stalker_id,
+				"timestamp": row.timestamp,
+				"tension_ent": row.tension_ent,
+				"tension_sal": row.tension_sal,
+				"corriente_ent": row.corriente_ent,
+				"corriente_sal": row.corriente_sal,
+				"bateria": row.bateria
+			}
+			console.log(o)
+			res.send(o)
+		}
+	})}
 })
 
 app.param('nombre', function (req, res, next, nombre) {
