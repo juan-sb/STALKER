@@ -22,7 +22,7 @@ db.serialize(function() {
 	db.run(`CREATE TABLE IF NOT EXISTS mediciones (
 		id INTEGER PRIMARY KEY,
 		stalker_id INTEGER,
-		timestamp INTEGER
+		timestamp INTEGER,
 		corriente_ent INTEGER,
 		corriente_sal INTEGER,
 		tension_ent INTEGER,
@@ -30,17 +30,6 @@ db.serialize(function() {
 		bateria INTEGER,
 		FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
 	)`);
-	var stmt = db.prepare('INSERT INTO lorem VALUES (?)')
-
-	for(var i = 0; i < 10; i++) {
-		stmt.run('Ipsum ' + i)
-	}
-
-	stmt.finalize()
-
-	db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
-		console.log(row.id + ': ' + row.info)
-	})
 })
 
 db.parallelize();
@@ -64,10 +53,10 @@ app.get('/api/:num', function (req, res) {
 			"stalker_id": row.stalker_id,
 			"timestamp": row.timestamp,
 			"tension_ent": row.tension_ent,
-			"tension_sal": tension_sal,
-			"corriente_ent": corriente_ent,
-			"corriente_sal": corriente_sal,
-			"bateria": bateria
+			"tension_sal": row.tension_sal,
+			"corriente_ent": row.corriente_ent,
+			"corriente_sal": row.corriente_sal,
+			"bateria": row.bateria
 		}
 
 		console.log(o)
