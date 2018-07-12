@@ -30,6 +30,8 @@ db.serialize(function() {
 		bateria INTEGER,
 		FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
 	)`);
+
+	
 })
 
 db.parallelize();
@@ -45,11 +47,15 @@ app.get('/test1/desc', (req, res) => res.download('logoSTALKER.png', 'logo.png')
 
 
 //app.get('/:num', (req, res) => res.send("Has pedido " + req.params.num))
-app.get('/api', function (req, res) {
+app.get('/api/getone', function (req, res) {
+	if(!req.query.id){
+		res.send("Invalid ID")
+		return;
+	}
 	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.query.id), function(err, row){
 		if(err) console.log(err.message)
 		else{
-			var o = {
+			/*var o = {
 				"id": row.id,
 				"stalker_id": row.stalker_id,
 				"timestamp": row.timestamp,
@@ -59,9 +65,24 @@ app.get('/api', function (req, res) {
 				"corriente_sal": row.corriente_sal,
 				"bateria": row.bateria
 			}
-			console.log(o)
-			res.send(o)
+			console.log(row)*/
+			console.log(row)
+			res.send(row)
 		}
+	})
+})
+
+app.get('/api/rango', function (req, res) {
+	if(!req.query.from || !req.query.to) {
+		console.log("Argumentos erroneos")
+		res.send("Argumentos erroneos")
+		return;
+	}
+	console.log("Hola Juan. From = " + req.query.from + " y to = " + req.query.to)
+	db.all(`SELECT * FROM mediciones WHERE id BETWEEN (?) AND (?)`, (req.query.from, req.query.to), function (err, rows) {
+		if(err) console.log(err.message)
+		console.log(util.inspect(rows))
+		res.send(rows)
 	})
 })
 
@@ -77,7 +98,11 @@ app.get('/test2/:nombre', function (req, res) {
 
 
 app.post('/post/', function (req, res){
+	
 	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac);
+
+	db.run(`INSERT INTO mediciones (stalker_id, corriente_ent) VALUES ((?), (?))`, (req.body.id, req.body.ce))
+	
 })
 
 app.listen(puerto, () => console.log("Corriendo servidor en el puerto " + puerto))
