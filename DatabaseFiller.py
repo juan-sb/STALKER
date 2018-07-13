@@ -1,5 +1,6 @@
 import sqlite3
 import random as r
+import time
 
 print("Ingrese el archivo de la base de datos: ")
 dbfile = input()
@@ -24,11 +25,12 @@ c.execute('''CREATE TABLE IF NOT EXISTS mediciones (
 		FOREIGN KEY (stalker_id) REFERENCES stalkers(id)
 	)''')
 
-print("Ingrese el valor de la ID unica del STALKER: ");
+print("Ingrese el valor de la ID unica del STALKER: ")
 sta_id = int(input())
 
-print("Ingrese la fecha y hora inicial en tiempo UNIX: ")
-t0 = int(input())
+print("Ingrese la fecha y hora inicial en tiempo UNIX ('ac' para el actual): ")
+t = input()
+t0 = int(time.time()) if t == 'ac' else int(t)
 
 print("Ingrese el valor inicial de tension de entrada en mV: ")
 tens_ent = int(input())
@@ -62,6 +64,9 @@ for cont in range(total):
     fila[1] = fila[1] + dt
     for x in range(2, len(fila)):
             fila[x] = fila[x] + int(500 * r.gauss(0, 0.2))
+            if(x == len(fila)-1):
+                while(fila[x] > 100 ):
+                        fila[x] = fila[x] + int(500 * r.gauss(0, 0.2))
             while(fila[x] < 0):
                     fila[x] = fila[x] + int(500 * r.gauss(0, 0.2))
                 

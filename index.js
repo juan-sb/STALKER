@@ -72,19 +72,34 @@ app.get('/api/getone', function (req, res) {
 	})
 })
 
-app.get('/api/rango', function (req, res) {s
+
+app.get('/api/rango', function (req, res) {
 	if(!req.query.from || !req.query.to) {
-		console.log("Argumentos erroneos")
 		res.send("Argumentos erroneos")
 		return;
 	}
-	console.log("Hola Juan. From = " + req.query.from + " y to = " + req.query.to)
-	db.all(`SELECT * FROM mediciones WHERE id BETWEEN (?) AND (?)`, (req.query.from, req.query.to), function (err, rows) {
-		if(err) console.log(err.message)
-		console.log(util.inspect(rows))
-		res.send(rows)
+	db.all(`SELECT * FROM mediciones WHERE id BETWEEN (?) AND (?)`, [req.query.from, req.query.to], function (err, row) {
+		if(err){
+			console.log(err.message)
+			throw err
+		}
+		console.log(row)
+		res.send(row)
 	})
 })
+
+
+app.get('/api/ult', function (req, res) {
+	db.all(`SELECT * FROM mediciones WHERE stalker_id = (?) ORDER BY id DESC LIMIT (?)`, [req.query.staid, req.query.cant], function (err, row) {
+		if(err){
+			console.log(err.message)
+			throw err
+		}
+		console.log(row)
+		res.send(row)
+	})
+})
+
 
 app.param('nombre', function (req, res, next, nombre) {
 	req.nombre = (nombre == 'Juan') ? 'Admin Juan' : 'Random' + nombre;
@@ -98,11 +113,9 @@ app.get('/test2/:nombre', function (req, res) {
 
 
 app.post('/post/', function (req, res){
-	
-	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac);
-
+	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac)
 	db.run(`INSERT INTO mediciones (stalker_id, corriente_ent) VALUES ((?), (?))`, (req.body.id, req.body.ce))
-	
 })
+
 
 app.listen(puerto, () => console.log("Corriendo servidor en el puerto " + puerto))
