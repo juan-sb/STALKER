@@ -7,6 +7,26 @@ const puerto = process.env.PORT || 3000;
 
 const dburl = './STALKERDB/StalkerDebug3.db';
 
+/*
+var PythonShell = require('python-shell')
+var pysh = new PythonShell("DatabaseFiller.py")
+var options = {
+	mode:'text',
+	pythonOptions: ['-u'],
+	scriptPath: '',
+	args: [dburl, 1, 'ac',16500, 12050, 1530, 2609,	6590, 300, 100]
+}
+
+PythonShell.run("", )
+PythonShell.run('DatabaseFiller.py', options, function (err, results) {
+	if (err) console.log("Python: " + err.message)
+	console.log(results);
+})
+pysh.on('message', (message) => {
+	console.log(message)
+})
+*/
+
 var db = new sqlite3.Database(dburl, function (err) {
 	if (err)
 		console.error(err.message)
@@ -16,7 +36,7 @@ var db = new sqlite3.Database(dburl, function (err) {
 
 db.serialize(function() {
 	db.run(`CREATE TABLE IF NOT EXISTS stalkers (
-		stalker_id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY,
 		user_id INTEGER
 	)`);
 	db.run(`CREATE TABLE IF NOT EXISTS mediciones (
@@ -29,9 +49,7 @@ db.serialize(function() {
 		tension_sal INTEGER,
 		bateria INTEGER,
 		FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
-	)`);
-
-	
+	)`);	
 })
 
 db.parallelize();
@@ -55,17 +73,6 @@ app.get('/api/getone', function (req, res) {
 	db.get(`SELECT * FROM mediciones WHERE id = (?)`, (req.query.id), function(err, row){
 		if(err) console.log(err.message)
 		else{
-			/*var o = {
-				"id": row.id,
-				"stalker_id": row.stalker_id,
-				"timestamp": row.timestamp,
-				"tension_ent": row.tension_ent,
-				"tension_sal": row.tension_sal,
-				"corriente_ent": row.corriente_ent,
-				"corriente_sal": row.corriente_sal,
-				"bateria": row.bateria
-			}
-			console.log(row)*/
 			console.log(row)
 			res.send(row)
 		}
@@ -105,6 +112,22 @@ app.param('nombre', function (req, res, next, nombre) {
 	req.nombre = (nombre == 'Juan') ? 'Admin Juan' : 'Random' + nombre;
 	next();
 })
+
+
+app.param('staid', function(req, res, next, staid) {
+	db.get(`SELECT * FROM stalkers WHERE id = (?)`, req.params.staid, function (err, row){
+		if(err) console.log(err.message)
+		req.staid = row ? req.params.staid : undefined
+		if(req.staid) next()
+		else res.send("Invalid id")
+	})
+})
+
+/*
+app.get('/api/:staid', (req, res) => {
+	db.get(``,)
+})
+*/
 
 
 app.get('/test2/:nombre', function (req, res) {

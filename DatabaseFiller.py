@@ -1,10 +1,16 @@
 import sqlite3
 import random as r
 import time
+import sys
+
 
 print("Ingrese el archivo de la base de datos: ")
-dbfile = input()
+print(sys.argv)
 
+try: sys.argv[1]
+except: dbfile = input()
+else: dbfile = sys.argv[1]
+                 
 conn = sqlite3.connect(dbfile)
 c = conn.cursor()
 
@@ -26,32 +32,52 @@ c.execute('''CREATE TABLE IF NOT EXISTS mediciones (
 	)''')
 
 print("Ingrese el valor de la ID unica del STALKER: ")
-sta_id = int(input())
+try: sys.argv[2]
+except: staid = int(input())
+else: sta_id = sys.argv[2]
 
 print("Ingrese la fecha y hora inicial en tiempo UNIX ('ac' para el actual): ")
-t = input()
-t0 = int(time.time()) if t == 'ac' else int(t)
+try: sys.argv[3]
+except: t = input()
+else: t = sys.argv[3]
+t0 = int(time.time()) if (t == 'ac') else int(t)
+
 
 print("Ingrese el valor inicial de tension de entrada en mV: ")
-tens_ent = int(input())
+try: sys.argv[4]
+except: staid = int(input())
+else: tens_ent = sys.argv[4]
 
 print("Ingrese el valor inicial de tension de salida en mV: ")
-tens_sal = int(input())
+try: sys.argv[5]
+except: tens_sal = int(input())
+else: tens_sal = sys.argv[5]
 
 print("Ingrese el valor inicial de corriente de entrada en mA: ")
-corr_ent = int(input())
+try: sys.argv[6]
+except: corr_ent = int(input())
+else: corr_ent = sys.argv[6]
+
 
 print("Ingrese el valor inicial de corriente de salida en mA: ")
-corr_sal = int(input())
+try: sys.argv[7]
+except: corr_sal = int(input())
+else: corr_sal = sys.argv[7]
 
 print("Ingrese el valor inicial de bateria en centésimas de %: ");
-bat = int(input())
+try: sys.argv[8]
+except: bat = int(input())
+else: bat = sys.argv[8]
 
 print("Ingrese el tiempo entre mediciones en segundos: ")
-dt = int(input())
+try: sys.argv[9]
+except: dt = int(input())
+else: dt = sys.argv[9]
 
 print("Ingrese el numero de valores a generar e ingresar: ")
-total = int(input())
+try: sys.argv[10]
+except: total = int(input())
+else: total = sys.argv[10]
 
 fila = [sta_id, t0, corr_ent, corr_sal, tens_ent, tens_sal, bat]
 
@@ -73,3 +99,5 @@ for cont in range(total):
 
 conn.commit()
 conn.close()
+print("Realizado")
+sys.stdout.flush()
