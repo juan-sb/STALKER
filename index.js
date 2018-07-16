@@ -150,7 +150,7 @@ app.get('/api/:staid', (req, res) => {
 				let is=[]
 
 				for(var i = 1; i <= cantidad; i++) { is.push(i) }
-				Promise.all(is.map(hacerPromesaGetDb)).then((rows) => {
+				Promise.all(is.map(promesaPromedios)).then((rows) => {
 					console.log(rows)
 					res.send(rows)
 				})
