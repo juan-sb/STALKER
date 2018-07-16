@@ -134,7 +134,7 @@ app.get('/api/:staid', (req, res) => {
 				var respuesta = [];
 				var sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)"
 
-				function promesaPromedios(sql, i, interv, hinicial){
+				function promesaPromedios(i){
 					return new Promise((resolve,reject)=>{
 						db.get(sql, [
 							(parseInt(hinicial) + (timebase * ((i- 1) * interv))),
