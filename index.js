@@ -164,9 +164,10 @@ app.get('/api/:staid', (req, res) => {
 
 			}
 			else if(interv == 1 || !interv) {
-				db.all(`SELECT (?) FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)`, [
-					(parseInt(hinicial) + (timebase * ((i- 1) * interv))), 
-					(parseInt(hinicial) + (timebase * (i * interv - 1))), req.staid],
+				console.log()
+				db.all("SELECT " + dbParam + ` FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)`, [
+					(parseInt(hinicial)), 
+					(parseInt(hinicial) + (timebase * cantidad - 1)), req.staid],
 				(err, rows) => {
 					if(err) console.log(err.message)
 					res.send(rows)
