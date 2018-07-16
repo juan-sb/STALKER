@@ -18,7 +18,7 @@ queryPromedios = queryPromedios.join(", ");
 
 /*
 var spawn = require('child_process').spawn
-var p = spawn('py', ['DatabaseFiller.py', dburl, 1, 'ac',16500, 12050, 1530, 2609,	6590, 300, 100, 1, 1])
+var p = spawn('py', ['DatabaseFiller.py', dburl, 1, 'ac',16500, 12050, 1530, 2609,	6590, 900, 5000, 1, 1])
 
 p.stdout.on('data', function(data) {
 	console.log(data.toString())

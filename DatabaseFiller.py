@@ -2,6 +2,7 @@ import sqlite3
 import random as r
 import time
 import sys
+import os
 
 for a in sys.argv:
     sys.stdout.write(a)
@@ -95,6 +96,7 @@ fila = [sta_id, t0, corr_ent, corr_sal, tens_ent, tens_sal, bat]
 
 print("Fila normal: ")
 print(fila)
+c.execute('''BEGIN TRANSACTION''')
 try:
     asd = sys.argv[11]
     print(asd)
@@ -117,6 +119,7 @@ for cont in range(total):
                 corriente_sal, tension_ent, tension_sal, bateria)
                 VALUES (?,?,?,?,?,?,?)''', fila)
     if(1): print(fila)
+    if((cont % 25) == 0): os.system('cls')
     fila[1] = fila[1] + dt
     for x in range(2, len(fila)):
             fila[x] = fila[x] + int(500 * (r.gauss(0, 0.2)))
