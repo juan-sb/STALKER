@@ -16,13 +16,14 @@ queryPromedios.forEach((element, index, array) => {
 });
 queryPromedios = queryPromedios.join(", ");
 
+/*
 var spawn = require('child_process').spawn
 var p = spawn('py', ['DatabaseFiller.py', dburl, 1, 'ac',16500, 12050, 1530, 2609,	6590, 300, 100, 1, 1])
 
 p.stdout.on('data', function(data) {
 	console.log(data.toString())
 })
-
+*/
 
 var db = new sqlite3.Database(dburl, function (err) {
 	if (err)
@@ -130,39 +131,31 @@ app.get('/api/:staid', (req, res) => {
 	if(cantidad) {
 		if(hinicial){
 			if(interv > 1) {
-				console.log("INTERV > 1!!!")
 				var respuesta = [];
 				var sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)"
 
-				function hacerPromesaGetDb(i){
-					console.log("ERSTOY HACIENDO LA PROMESA")
+				function promesaPromedios(sql, i, interv, hinicial){
 					return new Promise((resolve,reject)=>{
-						console.log("ERSTOY ADENTR5O DEL COSO DE LA PROMESA")
 						db.get(sql, [
-							(parseInt(hinicial) + (timebase * ((i- 1) * interv))), 
-							(parseInt(hinicial) + (timebase * (i * interv - 1))), req.staid], 
-							(err, row) => {
+							(parseInt(hinicial) + (timebase * ((i- 1) * interv))),
+							(parseInt(hinicial) + (timebase * (i * interv - 1))), req.staid], (err, row) => {
 							if(err){
 								reject(err)
 							}else{
 								resolve(row)
 							}
 						})
-					})
-					
+					})	
 				}
-
 				let is=[]
-				for(var i = 1; i <= cantidad; i++) {
-					is.push(i)
-				}
-				console.log("ERSTOY A PUNTA DE MANDAR .ALL")
-				Promise.all(is.map(hacerPromesaGetDb)).then((rows)=>{
+
+				for(var i = 1; i <= cantidad; i++) { is.push(i) }
+				Promise.all(is.map(hacerPromesaGetDb)).then((rows) => {
 					console.log(rows)
 					res.send(rows)
 				})
-
 			}
+
 			else if(interv == 1 || !interv) {
 				console.log()
 				db.all("SELECT " + dbParam + ` FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)`, [
@@ -174,9 +167,13 @@ app.get('/api/:staid', (req, res) => {
 				})
 			}
 		}
-		else if(pedirUltimos) {
 
+		else if(pedirUltimos) {
+			if(interv > 1) {
+
+			}
 		}
+
 		else {
 			res.sendStatus(404)
 		}
