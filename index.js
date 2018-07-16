@@ -7,8 +7,8 @@ const puerto = process.env.PORT || 3000;
 
 const dburl = './STALKERDB/StalkerDebug3.db';
 
-var dbParam = "timestamp, corriente_ent, corriente_sal, tension_ent, tension_sal, bateria"
-var timebase = 300;
+const dbParam = "timestamp, corriente_ent, corriente_sal, tension_ent, tension_sal, bateria"
+const timebase = 300;
 
 var queryPromedios = dbParam.split(", ")
 queryPromedios.forEach((element, index, array) => {
@@ -24,6 +24,43 @@ p.stdout.on('data', function(data) {
 	console.log(data.toString())
 })
 */
+
+function promesaGetDB(query, par){
+	return new Promise((resolve,reject)=>{
+		db.get(query, par, (err, row) => {
+			if(err){
+				reject(err)
+			}else{
+				resolve(row)
+			}
+		})
+	})	
+}
+
+
+function promesaEachDB(query, par){
+	return new Promise((resolve,reject)=>{
+		db.each(query, par, (err, row) => {
+			if(err){
+				reject(err)
+			}else{
+				resolve(row)
+			}
+		})
+	})	
+}
+
+function promesaAllDB(query, par){
+	return new Promise((resolve,reject)=>{
+		db.get(query, par, (err, row) => {
+			if(err){
+				reject(err)
+			}else{
+				resolve(row)
+			}
+		})
+	})
+}
 
 var db = new sqlite3.Database(dburl, function (err) {
 	if (err)
@@ -131,14 +168,16 @@ app.get('/api/:staid', (req, res) => {
 	if(cantidad) {
 		if(hinicial){
 			if(interv > 1) {
-				var respuesta = [];
-				var sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)"
-
-				function promesaPromedios(i){
+				
+				const sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)"
+				
+				function promesaPromedios(i) {
 					return new Promise((resolve,reject)=>{
-						db.get(sql, [
-							(parseInt(hinicial) + (timebase * ((i- 1) * interv))),
-							(parseInt(hinicial) + (timebase * (i * interv - 1))), req.staid], (err, row) => {
+						db.get(sql, 
+							[(parseInt(hinicial) + (timebase * ((i- 1) * interv))),
+							(parseInt(hinicial) + (timebase * (i * interv - 1))), 
+							req.staid], 
+							(err, row) => {
 							if(err){
 								reject(err)
 							}else{
@@ -147,10 +186,12 @@ app.get('/api/:staid', (req, res) => {
 						})
 					})	
 				}
+
 				let is=[]
 
-				for(var i = 1; i <= cantidad; i++) { is.push(i) }
-				Promise.all(is.map(promesaPromedios)).then((rows) => {
+				for(let i = 1; i <= cantidad; i++) { is.push(i) }
+				Promise.all(is.map(promesaPromedios))
+				.then((rows) => {
 					console.log(rows)
 					res.send(rows)
 				})
@@ -170,7 +211,35 @@ app.get('/api/:staid', (req, res) => {
 
 		else if(pedirUltimos) {
 			if(interv > 1) {
+				const sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?) ORDER BY AVG(timestamp) ASC"
+				
+				function promesaPromedios(i) {
+					return new Promise((resolve,reject)=>{
+						db.get(sql, 
+							[(lastTimestamp - (((i * interv) - 1) * timebase)), 
+							(lastTimestamp - ((i - 1) * interv * timebase)), 
+							req.staid], 
+							(err, row) => {
+							if(err) {
+								reject(err)
+							} else {
+								resolve(row)
+							}
+						})
+					})	
+				}
 
+				let is = []
+				for(var i = 1; i < cantidad; i++) { is.push(i) }
+				var lastTimestamp
+				promesaGetDB(`SELECT timestamp FROM mediciones WHERE stalker_id = ? ORDER BY timestamp DESC LIMIT 1`, req.staid)
+				.then((row) => {
+					lastTimestamp = row.timestamp
+					Promise.all(is.map(promesaPromedios))
+					.then(rows => {
+						res.send(rows)
+					})
+				})
 			}
 		}
 
