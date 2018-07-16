@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-var sqlite3 = require('sqlite3').verbose()
+var Database = require('better-sqlite3')
 
 const puerto = process.env.PORT || 3000; 
 
@@ -23,33 +23,23 @@ p.stdout.on('data', function(data) {
 	console.log(data.toString())
 })
 
+var db = new Database(dburl)
 
-var db = new sqlite3.Database(dburl, function (err) {
-	if (err)
-		console.error(err.message)
-	else
-		console.log("Conectado a la base de datos del sistema STALKER")
-})
-
-db.serialize(function() {
-	db.run(`CREATE TABLE IF NOT EXISTS stalkers (
-		id INTEGER PRIMARY KEY,
-		user_id INTEGER
-	)`);
-	db.run(`CREATE TABLE IF NOT EXISTS mediciones (
-		id INTEGER PRIMARY KEY,
-		stalker_id INTEGER,
-		timestamp INTEGER,
-		corriente_ent INTEGER,
-		corriente_sal INTEGER,
-		tension_ent INTEGER,
-		tension_sal INTEGER,
-		bateria INTEGER,
-		FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
-	)`);	
-})
-
-db.parallelize();
+db.exec(`CREATE TABLE IF NOT EXISTS stalkers (
+	id INTEGER PRIMARY KEY,
+	user_id INTEGER
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS mediciones (
+	id INTEGER PRIMARY KEY,
+	stalker_id INTEGER,
+	timestamp INTEGER,
+	corriente_ent INTEGER,
+	corriente_sal INTEGER,
+	tension_ent INTEGER,
+	tension_sal INTEGER,
+	bateria INTEGER,
+	FOREIGN KEY (stalker_id) REFERENCES stalkers(stalker_id)
+)`);	
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -130,15 +120,15 @@ app.get('/api/:staid', (req, res) => {
 	if(cantidad) {
 		if(hinicial){
 			if(interv > 1) {
-				console.log("INTERV > 1!!!")
 				var respuesta = [];
 				var sql = "SELECT " + queryPromedios + " FROM mediciones WHERE timestamp BETWEEN (?) AND (?) AND stalker_id = (?)"
+				var query = db.prepare(sql)
 
 				function hacerPromesaGetDb(i){
-					console.log("ERSTOY HACIENDO LA PROMESA")
+					consoloe.log("ERSTOY HACIENDO LA PROMESA")
 					return new Promise((resolve,reject)=>{
-						console.log("ERSTOY ADENTR5O DEL COSO DE LA PROMESA")
-						db.get(sql, [
+						consoloe.log("ERSTOY ADENTR5O DEL COSO DE LA PROMESA")
+						query.get([
 							(parseInt(hinicial) + (timebase * ((i- 1) * interv))), 
 							(parseInt(hinicial) + (timebase * (i * interv - 1))), req.staid], 
 							(err, row) => {
@@ -156,7 +146,7 @@ app.get('/api/:staid', (req, res) => {
 				for(var i = 1; i <= cantidad; i++) {
 					is.push(i)
 				}
-				console.log("ERSTOY A PUNTA DE MANDAR .ALL")
+				consoloe.log("ERSTOY A PUNTA DE MANDAR .ALL")
 				Promise.all(is.map(hacerPromesaGetDb)).then((rows)=>{
 					console.log(rows)
 					res.send(rows)
