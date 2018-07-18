@@ -72,7 +72,8 @@ var db = new sqlite3.Database(dburl, function (err) {
 db.serialize(function() {
 	db.run(`CREATE TABLE IF NOT EXISTS stalkers (
 		id INTEGER PRIMARY KEY,
-		user_id INTEGER
+		user_id INTEGER,
+		mac VARCHAR(17)
 	)`);
 	db.run(`CREATE TABLE IF NOT EXISTS mediciones (
 		id INTEGER PRIMARY KEY,
@@ -112,6 +113,12 @@ app.get('/api/getone', function (req, res) {
 			res.send(row)
 		}
 	})
+})
+
+
+app.get('/api/UNIXSERVERTIME', function (req, res) {
+	console.log(Math.round(new Date().getTime() / 1000))
+	res.send(String(Math.round(new Date().getTime() / 1000)))
 })
 
 
@@ -256,8 +263,37 @@ app.get('/test2/:nombre', function (req, res) {
 
 
 app.post('/post/', function (req, res){
-	res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac)
-	db.run(`INSERT INTO mediciones (stalker_id, corriente_ent) VALUES ((?), (?))`, (req.body.id, req.body.ce))
+	//db.run(`INSERT INTO mediciones (stalker_id, corriente_ent) VALUES ((?), (?))`, (req.body.id, req.body.ce))
+	//db.get("SELECT mac FROM stalkers WHERE ")
+	//res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac)
+	promesaGetDB("SELECT * FROM stalkers WHERE id = ? AND mac = ?",
+				[req.body.id, req.body.mac])
+	.catch((e) => {
+		console.log("Mac incorrecta");
+		return;
+	})
+	.then((row) => {
+		if(row)
+			db.run(`INSERT INTO mediciones(stalker_id, ` + dbParam + `) 
+				VALUES (?, ?, ?, ?, ?, ?, ?)`,
+				[req.body.id, req.body.ts, req.body.corrent,
+				req.body.corrsal, req.body.tensent, req.body.tenssal,
+				req.body.bater],
+				(err) => {
+					if(err) console.log(err.message)
+					else res.send("Congratz")
+				})
+		else {
+			console.log("Mac incorrecta")
+		}
+	})
+	var serverTS = Math.round(new Date().getTime()/1000);
+	console.log("Delta T = " + (serverTS - req.body.ts))
+	console.log(req.body.tensent)
+	console.log(req.body.tenssal)
+	console.log(req.body.corrent)
+	console.log(req.body.corrsal)
+	console.log(req.body.bater)
 })
 
 
