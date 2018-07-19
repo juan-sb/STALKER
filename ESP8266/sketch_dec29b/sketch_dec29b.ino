@@ -2,10 +2,12 @@
 #include <ESP8266HTTPClient.h>
 #include <Ticker.h>
 Ticker unixRTC;
+
 union dosenuno {
   uint64_t valor;
   uint32_t mitades[2];
 };
+
 int contadorMedicionesTruchas = 0;
 uint16 corr_ent[] = {2120, 2078, 2035, 1928, 1889, 1937, 1791, 1658, 1543, 1660};
 uint16 corr_sal[] = {6541, 6388, 6344, 6329, 6189, 6314, 6501, 6324, 6304, 6326};
@@ -31,7 +33,7 @@ const char* pwd = "0041816767";
 */
 char bufferS[256];
 int cont = 0;
-const int id = 1;
+const int id = 2;
 
 void setup() {
   // put your setup code here, to run once:
@@ -46,7 +48,7 @@ void setup() {
   }
   Serial.println("Conectado exitosamente");
   HTTPClient http;
-  http.begin("192.168.0.19", 3000, "/api/UNIXSERVERTIME");
+  http.begin("192.168.0.22", 3000, "/api/UNIXSERVERTIME");
   while(http.GET() != HTTP_CODE_OK){
     delay(50);
   }
@@ -58,7 +60,7 @@ void setup() {
 void loop() {
   //if(WiFi.status() == WL_CONNECTED){  
     HTTPClient http;
-    http.begin("192.168.0.19", 3000, "/post");
+    http.begin("192.168.0.22", 3000, "/post");
     /*
     int httpCode = http.GET();
     String payload = http.getString();        
@@ -96,6 +98,6 @@ void loop() {
     bufferS[cont] = Serial.read();
     cont++;
   }
-  delay(10000);
+  delay(1000);
   
 }

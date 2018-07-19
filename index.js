@@ -266,6 +266,7 @@ app.post('/post/', function (req, res){
 	//db.run(`INSERT INTO mediciones (stalker_id, corriente_ent) VALUES ((?), (?))`, (req.body.id, req.body.ce))
 	//db.get("SELECT mac FROM stalkers WHERE ")
 	//res.send("Nombre: " + req.body.nom + '|Apellido: ' + req.body.ape + "|Mac: " + req.body.mac)
+	console.log(req.body.mac)
 	promesaGetDB("SELECT * FROM stalkers WHERE id = ? AND mac = ?",
 				[req.body.id, req.body.mac])
 	.catch((e) => {
@@ -273,7 +274,7 @@ app.post('/post/', function (req, res){
 		return;
 	})
 	.then((row) => {
-		if(row)
+		if(row){
 			db.run(`INSERT INTO mediciones(stalker_id, ` + dbParam + `) 
 				VALUES (?, ?, ?, ?, ?, ?, ?)`,
 				[req.body.id, req.body.ts, req.body.corrent,
@@ -283,6 +284,7 @@ app.post('/post/', function (req, res){
 					if(err) console.log(err.message)
 					else res.send("Congratz")
 				})
+			}
 		else {
 			console.log("Mac incorrecta")
 		}
