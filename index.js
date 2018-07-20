@@ -200,7 +200,10 @@ app.get('/api/:staid', (req, res) => {
 				Promise.all(is.map(promesaPromedios))
 				.then((rows) => {
 					console.log(rows)
-					res.send(rows)
+					const o = {
+						'array': rows
+					}
+					res.send(o)
 				})
 			}
 
@@ -211,7 +214,10 @@ app.get('/api/:staid', (req, res) => {
 					(parseInt(hinicial) + (timebase * cantidad - 1)), req.staid],
 				(err, rows) => {
 					if(err) console.log(err.message)
-					res.send(rows)
+					const o = {
+						'array': rows
+					}
+					res.send(o)
 				})
 			}
 		}
@@ -244,7 +250,10 @@ app.get('/api/:staid', (req, res) => {
 					lastTimestamp = row.timestamp
 					Promise.all(is.map(promesaPromedios))
 					.then(rows => {
-						res.send(rows)
+						const o = {
+							'array': rows
+						}
+						res.send(o)
 					})
 				})
 			}
